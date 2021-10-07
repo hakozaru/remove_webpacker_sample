@@ -6,7 +6,11 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 
-const Hello = props => (
+type Props = {
+  name: string
+}
+
+const Hello = (props: Props) => (
   <div>Hello {props.name}!</div>
 )
 
