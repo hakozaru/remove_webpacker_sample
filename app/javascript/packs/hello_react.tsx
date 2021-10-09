@@ -7,6 +7,7 @@ import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import Img from '../images/webpack-png.png'
 import ImgInline, { ReactComponent as ImgComponent } from '../images/webpack-svg.svg'
+import '../stylesheets/sample.scss'
 
 type Props = {
   name: string
@@ -18,6 +19,13 @@ const Hello = (props: Props) => (
     <img src={Img} width='300px' />
     <img src={ImgInline} width='300px' />
     <ImgComponent width={300} />
+    <div className='dummyDiv'>
+      aaaaa<br/>
+      aaaaa<br/>
+      aaaaa<br/>
+      aaaaa<br/>
+      aaaaa<br/>
+    </div>
   </>
 )
 

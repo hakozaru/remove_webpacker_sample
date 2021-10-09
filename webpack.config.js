@@ -37,7 +37,7 @@ module.exports = {
       },
       {
         test: /\.(png)$/,
-        use: ["file-loader"]
+        type: "asset/resource"
       },
       {
         test: /\.(svg)$/,
@@ -45,7 +45,25 @@ module.exports = {
           '@svgr/webpack',
           'url-loader'
         ]
-      }
+      },
+      {
+        test: /\.scss/,
+        use: [
+          "style-loader",
+          {
+            loader: "css-loader",
+            options: {
+              sourceMap: !isProd
+            }
+          },
+          {
+            loader: "sass-loader",
+            options: {
+              sourceMap: !isProd
+            }
+          },
+        ],
+      },
     ],
   },
   plugins: [
