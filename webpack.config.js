@@ -38,6 +38,13 @@ module.exports = {
       {
         test: /\.(png)$/,
         use: ["file-loader"]
+      },
+      {
+        test: /\.(svg)$/,
+        use: [
+          '@svgr/webpack',
+          'url-loader'
+        ]
       }
     ],
   },
