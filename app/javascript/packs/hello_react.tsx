@@ -5,13 +5,17 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
+import Img from '../images/webpack-png.png'
 
 type Props = {
   name: string
 }
 
 const Hello = (props: Props) => (
-  <div>Hello {props.name}!</div>
+  <>
+    <div>Hello {props.name}!</div>
+    <img src={Img} width='300px' />
+  </>
 )
 
 Hello.defaultProps = {
