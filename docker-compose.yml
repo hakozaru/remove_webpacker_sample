@@ -1,0 +1,85 @@
+version: '3.8'
+
+x-app: &app
+  build:
+    context: .dockerdev
+    dockerfile: Dockerfile
+    args:
+      RUBY_VERSION: '2.7.3'
+      PG_MAJOR: '14'
+      NODE_MAJOR: '14'
+      YARN_VERSION: '1.22.15'
+      BUNDLER_VERSION: '2.2.29'
+  environment: &env
+    NODE_ENV: ${NODE_ENV:-development}
+    RAILS_ENV: ${RAILS_ENV:-development}
+    YARN_CACHE_FOLDER: /app/node_modules/.yarn-cache
+  image: remove_webpacker_sample:1.0.0
+  tmpfs:
+    - /tmp
+
+x-backend: &backend
+  <<: *app
+  stdin_open: true
+  tty: true
+  volumes:
+    - .:/app:cached
+    - rails_cache:/app/tmp/cache
+    - bundle:/usr/local/bundle
+    - node_modules:/app/node_modules
+    - packs:/app/public/packs
+    - .dockerdev/.psqlrc:/root/.psqlrc:ro
+    - .dockerdev/.bashrc:/root/.bashrc:ro
+  environment:
+    <<: *env
+    DATABASE_URL: postgres://postgres:postgres@postgres:5432
+    WEBPACK_DEV_SERVER_HOST: webpack
+    WEB_CONCURRENCY: 0
+    HISTFILE: /app/log/.bash_history
+    PSQL_HISTFILE: /app/log/.psql_history
+    EDITOR: vi
+  depends_on:
+    postgres:
+      condition: service_healthy
+
+services:
+  rails:
+    <<: *backend
+    command: bundle exec rails server -b 0.0.0.0
+    ports:
+      - '3000:3000'
+
+  postgres:
+    image: postgres:14.0
+    volumes:
+      - .dockerdev/.psqlrc:/root/.psqlrc:ro
+      - postgres:/var/lib/postgresql/data
+      - ./log:/root/log:cached
+    environment:
+      PSQL_HISTFILE: /root/log/.psql_history
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5432
+    healthcheck:
+      test: pg_isready -U postgres -h 127.0.0.1
+      interval: 5s
+
+  webpack:
+    <<: *app
+    command: yarn dev-server
+    ports:
+      - '8080:8080'
+    volumes:
+      - .:/app:cached
+      - bundle:/usr/local/bundle
+      - node_modules:/app/node_modules
+      - packs:/app/public/packs
+    environment:
+      <<: *env
+
+volumes:
+  postgres:
+  bundle:
+  node_modules:
+  rails_cache:
+  packs:
